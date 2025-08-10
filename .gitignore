@@ -23,3 +23,5 @@
 /*.pc
 
 .vscode/
+dist/
+vendor/

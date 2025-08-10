@@ -1,0 +1,41 @@
+version: 2
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - id: basic
+    main: .
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    goamd64:
+      - v1
+    flags:
+      - -trimpath
+    tags:
+      - no_chart
+    binary: '{{ trimsuffix .ProjectName "-cli" }}-{{ .Os }}-{{ .Arch }}'
+    ldflags:
+      - -s -w
+      - "-X {{ .ModulePath }}/pkg/version.version={{ .Version }}"
+      - "-X {{ .ModulePath }}/pkg/version.module={{ .ProjectName }}"
+      - "-X {{ .ModulePath }}/pkg/version.gitCommit={{ .ShortCommit }}"
+      - "-X {{ .ModulePath }}/pkg/version.buildDate={{ .Date }}"
+      - "-X {{ .ModulePath }}/pkg/version.branch={{ .Branch }}"
+archives:
+  - id: basic
+    name_template: '{{ trimsuffix .ProjectName "-cli" }}-{{ .Os }}-{{ .Arch }}'
+    ids:
+      - basic
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+release:
+  disable: true
+report_sizes: true
